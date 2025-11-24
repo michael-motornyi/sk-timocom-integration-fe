@@ -15,7 +15,7 @@ import type { VehicleSpaceOffer } from '@/types';
 import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { Trash } from 'lucide-react';
 import { useState, useTransition } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { deleteVehicleSpaceOfferAction } from '@/lib/actions';
 
 interface VehicleSpaceOffersListProps {
@@ -28,6 +28,7 @@ export default function VehicleSpaceOffersList({ offers }: VehicleSpaceOffersLis
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   // Get pagination params from URL
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
@@ -43,7 +44,7 @@ export default function VehicleSpaceOffersList({ offers }: VehicleSpaceOffersLis
     startTransition(() => {
       const params = new URLSearchParams(searchParams.toString());
       params.set('page', page.toString());
-      const newUrl = `/vehicle-space?${params.toString()}`;
+      const newUrl = `${pathname}?${params.toString()}`;
       router.push(newUrl);
       router.refresh();
     });

@@ -15,7 +15,7 @@ import type { FreightOffer } from '@/types';
 import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { Trash } from 'lucide-react';
 import { useState, useTransition } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { deleteFreightOfferAction } from '@/lib/actions';
 
 interface FreightOffersListProps {
@@ -28,6 +28,7 @@ export default function FreightOffersList({ offers }: FreightOffersListProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   // Get pagination params from URL
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
@@ -44,7 +45,7 @@ export default function FreightOffersList({ offers }: FreightOffersListProps) {
     startTransition(() => {
       const params = new URLSearchParams(searchParams.toString());
       params.set('page', page.toString());
-      const newUrl = `/?${params.toString()}`;
+      const newUrl = `${pathname}?${params.toString()}`;
       console.log('Navigation URL:', newUrl);
       router.push(newUrl);
       // Force refresh to ensure server components re-render
