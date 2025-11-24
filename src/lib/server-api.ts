@@ -1,6 +1,7 @@
 import type {
   ApiResponse,
   FreightOffer,
+  VehicleSpaceOffer,
   PaginatedResponse,
   PaginationParams,
   TestConnectionResponse,
@@ -80,6 +81,28 @@ export const getFreightOffer = cache(
   }
 );
 
+export const getVehicleSpaceOffers = cache(
+  async (params: PaginationParams = {}): Promise<PaginatedResponse<VehicleSpaceOffer>> => {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.set('page', params.page.toString());
+    if (params.limit) searchParams.set('limit', params.limit.toString());
+    if (params.status) searchParams.set('status', params.status);
+
+    const query = searchParams.toString();
+    const endpoint = `/api/timocom/vehicle-space-offers${query ? `?${query}` : ''}`;
+
+    return request<PaginatedResponse<VehicleSpaceOffer>>(endpoint);
+  }
+);
+
+export const getVehicleSpaceOffer = cache(
+  async (publicOfferId: string): Promise<ApiResponse<VehicleSpaceOffer>> => {
+    return request<ApiResponse<VehicleSpaceOffer>>(
+      `/api/timocom/vehicle-space-offers/${publicOfferId}`
+    );
+  }
+);
+
 // Client-side API class for mutations (actions that modify data)
 class ClientApiClient {
   private baseUrl: string;
@@ -135,6 +158,29 @@ class ClientApiClient {
 
   async generateFreightOffers(params: { count: number }): Promise<ApiResponse<FreightOffer[]>> {
     return this.request<ApiResponse<FreightOffer[]>>('/api/generate/freight', {
+      method: 'POST',
+      body: JSON.stringify({ count: params.count }),
+    });
+  }
+
+  // Vehicle Space Offer mutation methods
+  async deleteVehicleSpaceOffer(publicOfferId: string): Promise<ApiResponse<void>> {
+    return this.request<ApiResponse<void>>(`/api/timocom/vehicle-space-offers/${publicOfferId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async deleteAllVehicleSpaceOffers(): Promise<ApiResponse<void>> {
+    return this.request<ApiResponse<void>>('/api/timocom/vehicle-space-offers/delete-all', {
+      method: 'POST',
+      body: JSON.stringify({ confirm: true }),
+    });
+  }
+
+  async generateVehicleSpaceOffers(params: {
+    count: number;
+  }): Promise<ApiResponse<VehicleSpaceOffer[]>> {
+    return this.request<ApiResponse<VehicleSpaceOffer[]>>('/api/generate/vehicle-space', {
       method: 'POST',
       body: JSON.stringify({ count: params.count }),
     });

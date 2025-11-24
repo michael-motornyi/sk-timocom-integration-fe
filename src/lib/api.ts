@@ -1,6 +1,7 @@
 import type {
   ApiResponse,
   FreightOffer,
+  VehicleSpaceOffer,
   PaginatedResponse,
   PaginationParams,
   TestConnectionResponse,
@@ -94,6 +95,49 @@ class ApiClient {
 
   async generateFreightOffers(params: { count: number }): Promise<ApiResponse<FreightOffer[]>> {
     return this.request<ApiResponse<FreightOffer[]>>('/api/generate/freight', {
+      method: 'POST',
+      body: JSON.stringify({ count: params.count }),
+    });
+  }
+
+  // Vehicle Space Offers API
+  async getVehicleSpaceOffers(
+    params: PaginationParams = {}
+  ): Promise<PaginatedResponse<VehicleSpaceOffer>> {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.set('page', params.page.toString());
+    if (params.limit) searchParams.set('limit', params.limit.toString());
+    if (params.status) searchParams.set('status', params.status);
+
+    const query = searchParams.toString();
+    const endpoint = `/api/timocom/vehicle-space-offers${query ? `?${query}` : ''}`;
+
+    return this.request<PaginatedResponse<VehicleSpaceOffer>>(endpoint);
+  }
+
+  async getVehicleSpaceOffer(publicOfferId: string): Promise<ApiResponse<VehicleSpaceOffer>> {
+    return this.request<ApiResponse<VehicleSpaceOffer>>(
+      `/api/timocom/vehicle-space-offers/${publicOfferId}`
+    );
+  }
+
+  async deleteVehicleSpaceOffer(publicOfferId: string): Promise<ApiResponse<void>> {
+    return this.request<ApiResponse<void>>(`/api/timocom/vehicle-space-offers/${publicOfferId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async deleteAllVehicleSpaceOffers(): Promise<ApiResponse<void>> {
+    return this.request<ApiResponse<void>>('/api/timocom/vehicle-space-offers/delete-all', {
+      method: 'POST',
+      body: JSON.stringify({ confirm: true }),
+    });
+  }
+
+  async generateVehicleSpaceOffers(params: {
+    count: number;
+  }): Promise<ApiResponse<VehicleSpaceOffer[]>> {
+    return this.request<ApiResponse<VehicleSpaceOffer[]>>('/api/generate/vehicle-space', {
       method: 'POST',
       body: JSON.stringify({ count: params.count }),
     });

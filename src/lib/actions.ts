@@ -45,6 +45,48 @@ export async function generateFreightOffersAction(count: number) {
   }
 }
 
+export async function deleteVehicleSpaceOfferAction(id: string) {
+  try {
+    await clientApi.deleteVehicleSpaceOffer(id);
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete vehicle space offer:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to delete offer',
+    };
+  }
+}
+
+export async function deleteAllVehicleSpaceOffersAction() {
+  try {
+    await clientApi.deleteAllVehicleSpaceOffers();
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete all vehicle space offers:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to delete all offers',
+    };
+  }
+}
+
+export async function generateVehicleSpaceOffersAction(count: number) {
+  try {
+    const result = await clientApi.generateVehicleSpaceOffers({ count });
+    revalidatePath('/');
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Failed to generate vehicle space offers:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to generate offers',
+    };
+  }
+}
+
 export async function refreshDataAction() {
   try {
     revalidatePath('/');
